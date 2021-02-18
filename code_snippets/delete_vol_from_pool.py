@@ -22,9 +22,11 @@ pool = client.storagePoolLookupByName('vm-ubuntu-focal-lxd-1')
 volume_libvirt = pool.storageVolLookupByName('disk-2.img')
 print(volume_libvirt.path())
 if domain.state() != libvirt.VIR_DOMAIN_SHUTOFF:
-    print("Error: Instance \"{}\" is still running. Shut down or power off the instance before deleting the volume".format(instance_to_delete))
+    print("Error: Instance \"{}\" is still running."
+          " Shut down or power off the instance before deleting the volume".format(instance_to_delete))
 elif volume_libvirt.path() in disk_source_path:
-    print("Error: Disk is currently attached to instance \"{}\". Detach the disk first before deleting the volume".format(instance_to_delete))
+    print("Error: Disk is currently attached to instance \"{}\"."
+          " Detach the disk first before deleting the volume".format(instance_to_delete))
 else:
     volume_libvirt.delete()
     print("Volume deleted successfully.")
