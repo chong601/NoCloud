@@ -9,7 +9,7 @@ capacity = ElementTree.SubElement(volume, 'capacity').text = str(1*GIGABYTES)
 target = ElementTree.SubElement(volume, 'target')
 # format_attr has type which is the type of disk to create eg: raw, bochs, qcow, qcow2, qed, vmdk
 format_attr = {'type': 'qcow2'}
-format = ElementTree.SubElement(target, 'format', format_attr)
+disk_format = ElementTree.SubElement(target, 'format', format_attr)
 
 volume_xml = ElementTree.tostring(volume, 'unicode')
 print(volume_xml)
