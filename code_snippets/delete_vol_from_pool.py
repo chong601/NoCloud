@@ -6,7 +6,6 @@ instance_to_delete = 'vm-ubuntu-focal-lxd-1'
 domain = client.lookupByName(instance_to_delete)
 
 # find_disk.py start
-domain = client.lookupByName("vm-ubuntu-focal-lxd-1")
 xml = ElementTree.fromstring(domain.XMLDesc())
 disks = xml.findall("./devices/disk")
 disk_source_path = []
