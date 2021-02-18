@@ -11,6 +11,8 @@ target = ElementTree.SubElement(volume, 'target')
 format_attr = {'type': 'qcow2'}
 disk_format = ElementTree.SubElement(target, 'format', format_attr)
 
+# TODO: look into key
+
 volume_xml = ElementTree.tostring(volume, 'unicode')
 print(volume_xml)
 
