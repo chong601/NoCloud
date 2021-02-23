@@ -39,5 +39,7 @@ if pool_to_delete.isActive() == libvirt.VIR_STORAGE_POOL_INACTIVE:
 # with an absolute path to the disk, YET it creates a pool for you if you created a VM using
 # virt-install.
 #
+# Another fun fact: libvirt call destroy to **deactivate** a pool, undefine to remove a pool.
+#
 # Fuck libvirt.
 pool_to_delete.undefine()
