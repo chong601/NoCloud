@@ -1,0 +1,6 @@
+<disk type="{% disk_type %}">
+    <driver name="{% driver_name %}" driver="{% subdriver_name %}"/>
+    <!-- Look into other source formats -->
+    <source file="{% disk_path %}"/>
+    <target dev="{% target_dev %}" bus="{% bus_type %}"/>
+</disk>
