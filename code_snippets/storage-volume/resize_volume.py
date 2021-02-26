@@ -35,5 +35,5 @@ except libvirt.libvirtError:
 # > It is up to the storage pool implementation whether unaligned requests
 # > are rounded up to the next valid boundary, or rejected.
 #
-# OK libvirt, you do you " guess.
-disk.resize(100000, libvirt.VIR_STORAGE_VOL_RESIZE_DELTA)
+# OK libvirt, you do you I guess.
+disk.resize(ADDITIONAL_DISK_SPACE, libvirt.VIR_STORAGE_VOL_RESIZE_DELTA)
