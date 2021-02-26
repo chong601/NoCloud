@@ -25,3 +25,4 @@ Werkzeug
 WTForms
 pylxd
 paramiko
+pyyaml
