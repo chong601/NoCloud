@@ -1,19 +1,21 @@
 # Create VM is a multi-step process:
+# TODO: update this list to reflect new functionalities that is added after the process is written
 # - create a disk OR copy a pre-configured VM OR create a disk pool and create a volume
 #   - can also use filesystem-specific cloning features like ZFS or LVM snapshots
 # - resize the disk to appropriate sizes
 # - create Cloud-Init definitions eg: user, filesystem, packages, update
 #   - optionally create custom networks rather than DHCP
-# - deploy Cloud-Init configs either using `cloud-localds` or deploy to a webserver
+# - ~~deploy Cloud-Init configs either using `cloud-localds` or deploy to a webserver~~ NO NEED. WE HAVE `nocloud-net`
 # - create VM definitions on libvirt using libvirt Python API (oh lord pls no)
 # - define into libvirt to be registered
 # - start the VM
 
 # It would be nice if we can boot to network, reboot and return to normal boot sequence but eh
 from jinja2 import FileSystemLoader, Environment, select_autoescape
-import subprocess, libvirt
+import subprocess
+import libvirt
 from xml.etree import ElementTree
-from uuid import UUID
+from uuid import uuid4
 
 # String definitions
 ERR_POOL_NOT_FOUND = 'Pool "{}" is not found.'
@@ -32,10 +34,26 @@ DISK_CAPACITY = 100*GIGABYTES
 HOST_FILESYSTEM = 'zfs'
 POOL_NAME = 'vm-ubuntu-focal-lxd-1'
 
+EMULATION_TYPE = 'kvm'
+MEMORY_CAPACITY = 4*GIGABYTES
+MAX_MEMORY_CAPACITY = 16*GIGABYTES
+PROVISIONED_CPU_COUNT = 4
+HOST_CPU_COUNT = 16
+VM_UUID = str(uuid4())
+SOCKET_COUNT = 1
+CORE_COUNT = 24
+THREAD_COUNT = 1
+
 # Internal definitions
 ENABLED_ESCAPES = ['html', 'xml']
 DS_HOST = '10.102.7.97'
 DS_PORT = '5000'
+final_smbios_data = CLOUD_DS.format(DS_HOST, DS_PORT, VM_UUID)
+BIOS_VENDOR = 'NoCloud-libvirt-QEMU-KVM'
+VNC_PORT = -1
+VNC_LISTEN_IP = '0.0.0.0'
+DISK_PATH = '/zfs-storage-test/kvm-area'
+IMAGE_NAME = 'focal-server-cloudimg-amd64.img'
 j2_env = Environment(
     loader=FileSystemLoader('templates'),
     autoescape=select_autoescape(ENABLED_ESCAPES)
@@ -66,7 +84,6 @@ def call_qemu_img(self, source, dest, target_disk_format, disk_capacity, allocat
 
 volume_xml = ElementTree.tostring(volume, 'unicode')
 print(volume_xml)
-client = libvirt.open("qemu+ssh://chong601@10.102.0.5/system")
 pool = client.storagePoolLookupByName(POOL_NAME)
 
 # WARNING: ZFS DO NOT support falloc method of disk allocation
@@ -117,26 +134,136 @@ disk.resize(DISK_CAPACITY, libvirt.VIR_STORAGE_VOL_RESIZE_DELTA)
 
 # Define in libvirt
 # TODO: write define domain code
-domain = client.defineXML()
+# ALSO TODO: MAKE THIS DOMAIN XML THING A CLASS OF ITSELF. I HATE HOW IT LOOKS RIGHT NOW.
+# oooooooooooooooooooooooooooooooooooooooh fuck me why do I have to go through this...
+# This kind of code is I guess why we have so many bad developers out there, but to be honest:
+# - XML is hateful
+# - XML APIs forced me to do this
+# - the fact that libvirt **ENFORCES** the need to use XML which is just asinine
+domain_attr = {'type': EMULATION_TYPE}
+xml_domain = ElementTree.Element('domain', domain_attr)
+xml_name = ElementTree.SubElement(xml_domain, 'name').text = DOMAIN_NAME
+xml_uuid = ElementTree.SubElement(xml_domain, 'uuid').text = VM_UUID
+xml_memory = ElementTree.SubElement(xml_domain, 'memory').text = str(MAX_MEMORY_CAPACITY)
+xml_current_memory = ElementTree.SubElement(xml_domain, 'currentMemory').text = str(MEMORY_CAPACITY)
+vcpu_attr = {'current': str(PROVISIONED_CPU_COUNT)}
+xml_vcpu = ElementTree.SubElement(xml_domain, 'vcpu', vcpu_attr).text = str(HOST_CPU_COUNT)
+xml_os = ElementTree.SubElement(xml_domain, 'os')
+os_smbios_attr = {'mode': 'sysinfo'}
+xml_os_smbios = ElementTree.SubElement(xml_os, 'smbios', os_smbios_attr)
+os_type_attr = {'arch': 'x86_64', 'machine': 'q35'}
+xml_os_type = ElementTree.SubElement(xml_os, 'type', os_type_attr).text = 'hvm'
+os_boot_attr = {'dev': 'hd'}
+xml_os_boot = ElementTree.SubElement(xml_os, 'boot', os_boot_attr)
+xml_sysinfo = ElementTree.SubElement(xml_domain, 'sysinfo')
+xml_sysinfo_bios = ElementTree.SubElement(xml_sysinfo, 'bios')
+sysinfo_bios_vendor_attr = {'name': 'vendor'}
+xml_sysinfo_bios_entry = ElementTree.SubElement(xml_sysinfo_bios, 'entry', sysinfo_bios_vendor_attr).text = BIOS_VENDOR
+xml_sysinfo_system = ElementTree.SubElement(xml_sysinfo, 'system')
+sysinfo_system_manufacturer_attr = {'name': 'manufacturer'}
+xml_sysinfo_system_manufacturer = ElementTree.SubElement(xml_sysinfo_system, 'entry', sysinfo_system_manufacturer_attr).text = 'KVM'
+sysinfo_system_product_attr = {'name': 'product'}
+xml_sysinfo_system_product = ElementTree.SubElement(xml_sysinfo_system, 'entry', sysinfo_system_product_attr).text = 'libvirt-virt-manager'
+sysinfo_system_version_attr = {'name': 'version'}
+xml_sysinfo_system_version = ElementTree.SubElement(xml_sysinfo_system, 'entry', sysinfo_system_version_attr).text = '0.1-alpha'
+sysinfo_system_serial_attr = {'name': 'serial'}
+xml_sysinfo_system_serial = ElementTree.SubElement(xml_sysinfo_system, 'entry', sysinfo_system_serial_attr).text = final_smbios_data
+xml_sysinfo_chassis = ElementTree.SubElement(xml_sysinfo, 'chassis')
+sysinfo_chassis_manufacturer_attr = {'name': 'manufacturer'}
+xml_sysinfo_chassis_manufacturer = ElementTree.SubElement(xml_sysinfo_chassis, 'entry', sysinfo_chassis_manufacturer_attr).text = 'Dell'
+sysinfo_chassis_product_attr = {'name': 'product'}
+xml_sysinfo_chassis_product = ElementTree.SubElement(xml_sysinfo_chassis, 'entry', sysinfo_chassis_product_attr).text = 'PowerEdge R710'
+sysinfo_chassis_version_attr = {'name': 'version'}
+xml_sysinfo_chassis_version = ElementTree.SubElement(xml_sysinfo_chassis, 'entry', sysinfo_chassis_version_attr).text = '1.0'
+sysinfo_chassis_serial_attr = {'name': 'serial'}
+xml_sysinfo_chassis_serial = ElementTree.SubElement(xml_sysinfo_chassis, 'entry', sysinfo_chassis_serial_attr).text = 'H42H32S'
+xml_features = ElementTree.SubElement(xml_domain, 'features')
+xml_features_acpi = ElementTree.SubElement(xml_features, 'acpi')
+xml_features_apic = ElementTree.SubElement(xml_features, 'apic')
+cpu_attr = {'mode': 'host-model'}
+xml_cpu = ElementTree.SubElement(xml_domain, 'cpu', cpu_attr)
+cpu_topology_attr = {'sockets': str(SOCKET_COUNT), 'cores': str(CORE_COUNT), 'threads': str(THREAD_COUNT)}
+xml_cpu_topology = ElementTree.SubElement(xml_cpu, 'topology', cpu_topology_attr)
+clock_attr = {'offset': 'utc'}
+xml_clock = ElementTree.SubElement(xml_domain, 'clock', clock_attr)
+clock_timer_rtc_attr = {'name': 'rtc', 'tickpolicy': 'catchup'}
+xml_clock_timer_rtc = ElementTree.SubElement(xml_clock, 'timer', clock_timer_rtc_attr)
+clock_timer_pit_attr = {'name': 'pit', 'tickpolicy': 'delay'}
+xml_clock_timer_pit = ElementTree.SubElement(xml_clock, 'timer', clock_timer_pit_attr)
+clock_timer_hpet_attr = {'name': 'hpet', 'present': 'no'}
+xml_clock_timer_hpet = ElementTree.SubElement(xml_clock, 'timer', clock_timer_hpet_attr)
+xml_pm = ElementTree.SubElement(xml_domain, 'pm')
+pm_suspend_mem_attr = {'enabled': 'no'}
+xml_pm_suspend_mem = ElementTree.SubElement(xml_pm, 'suspend-to-mem', pm_suspend_mem_attr)
+pm_suspend_disk_attr = {'enabled': 'no'}
+xml_pm_suspend_disk = ElementTree.SubElement(xml_pm, 'suspend-to-disk', pm_suspend_disk_attr)
+xml_devices = ElementTree.SubElement(xml_domain, 'devices')
+# Do we need to define an emulator to use? Hopefully not.
+# I am not stoked on hardcoding path to the emulator...
+# Putting this in just in case if libvirt just doesn't wanna cooperate at all
+# xml_devices_emulator = ElementTree.SubElement(xml_devices, 'emulator').text = EMULATOR_PATH
+devices_disk_attr = {'type': 'file', 'device': 'disk'}
+xml_devices_disk = ElementTree.SubElement(xml_devices, 'disk', devices_disk_attr)
+devices_disk_driver_attr = {'name': 'qemu', 'type': 'qcow2', 'discard': 'unmap'}
+xml_devices_disk_driver = ElementTree.SubElement(xml_devices_disk, 'driver', devices_disk_driver_attr)
+devices_disk_source_attr = {'file': '{}/{}/{}'.format(DISK_PATH, DOMAIN_NAME, IMAGE_NAME)}
+xml_devices_disk_source = ElementTree.SubElement(xml_devices_disk, 'source', devices_disk_source_attr)
+devices_disk_target_attr = {'dev': 'sda', 'bus': 'scsi'}
+xml_devices_disk_target = ElementTree.SubElement(xml_devices_disk, 'target', devices_disk_target_attr)
+devices_controller_scsi_attr = {'type': 'scsi', 'model': 'virtio-scsi'}
+xml_devices_controller_scsi = ElementTree.SubElement(xml_devices, 'controller', devices_controller_scsi_attr)
+devices_controller_usb_attr = {'type': 'usb', 'model': 'qemu-xhci', 'ports': '15'}
+xml_devices_controller_usb = ElementTree.SubElement(xml_devices, 'controller', devices_controller_usb_attr)
+devices_interface_attr = {'type': 'network'}
+xml_devices_interface = ElementTree.SubElement(xml_devices, 'interface', devices_interface_attr)
+devices_interface_source_attr = {'network': 'default'}
+xml_devices_interface_source = ElementTree.SubElement(xml_devices_interface, 'source', devices_interface_source_attr)
+devices_interface_model_attr = {'type': 'virtio'}
+xml_devices_interface_model = ElementTree.SubElement(xml_devices_interface, 'model', devices_interface_model_attr)
+devices_console_type_attr = {'type': 'pty'}
+xml_devices_console_type = ElementTree.SubElement(xml_devices, 'console', devices_console_type_attr)
+devices_channel_attr = {'type': 'unix'}
+xml_devices_channel = ElementTree.SubElement(xml_devices, 'channel', devices_channel_attr)
+devices_channel_source_attr = {'mode': 'bind'}
+xml_devices_channel_source = ElementTree.SubElement(xml_devices_channel, 'source', devices_channel_source_attr)
+channel_target_attr = {'type': 'virtio', 'name': 'org.qemu.guest_agent.0'}
+xml_channel_target = ElementTree.SubElement(xml_devices_channel, 'target', channel_target_attr)
+devices_input_attr = {'type': 'tablet', 'bus': 'usb'}
+devices_xml_input = ElementTree.SubElement(xml_devices, 'input', devices_input_attr)
+devices_graphics_attr = {'type': 'vnc', 'port': str(VNC_PORT), 'listen': VNC_LISTEN_IP}
+xml_devices_graphics = ElementTree.SubElement(xml_devices, 'graphics', devices_graphics_attr)
+xml_devices_video = ElementTree.SubElement(xml_devices, 'video')
+devices_video_model_attr = {'type': 'qxl'}
+xml_devices_video_model = ElementTree.SubElement(xml_devices_video, 'model', devices_video_model_attr)
+devices_memballoon_attr = {'model': 'virtio'}
+devices_xml_memballoon = ElementTree.SubElement(xml_devices, 'memballoon', devices_memballoon_attr)
+devices_rng_attr = {'model': 'virtio'}
+xml_devices_rng = ElementTree.SubElement(xml_devices, 'rng', devices_rng_attr)
+devices_rng_backend_attr = {'model': 'random'}
+xml_devices_rng_backend = ElementTree.SubElement(xml_devices_rng, 'backend', devices_rng_backend_attr).text = '/dev/urandom'
+
+xml_str = ElementTree.tostring(xml_domain, 'unicode')
+domain = client.defineXML(xml_str)
 
 
 # Get UUID
 # TODO: write getUUID() code
+# This is fucking broken logic. I hate it. And UUID is already defined up there so this is completely useless
 try:
     domain_obj = client.lookupByName(DOMAIN_NAME)
+    domain_uuid = domain_obj.UUID()
 except libvirt.libvirtError:
     print(ERR_DOMAIN_NOT_FOUND.format(DOMAIN_NAME))
     exit(1)
-domain_uuid = domain_obj.UUID()
-# The UUID is returned in the form of actual bytes...
-# What the fuck.
-domain_uuid = domain_obj.UUID()
+
 
 # Set SMBIOS data
 # FIXME: can be combined into "Generate domain XML" section
 # Absolute cancer.
 # Why I need to do it this way.
-final_smbios_data = CLOUD_DS.format(DS_HOST, DS_PORT, UUID(bytes=domain_uuid))
+#
+# Also, already done above.
+
 
 # Generate user-data
 # TODO: Create sample helper code to expose user-data
@@ -148,7 +275,7 @@ final_smbios_data = CLOUD_DS.format(DS_HOST, DS_PORT, UUID(bytes=domain_uuid))
 # password: chong601
 # chpasswd: {expire: False}
 # ssh_pwauth: True
-# hostname: vm - ubuntu - focal - lxd - cluster - 3
+# hostname: vm-ubuntu-focal-lxd-cluster-3
 # timezone: "Asia/Kuala_Lumpur"
 # package_update: true
 # package_upgrade: true
@@ -164,9 +291,6 @@ final_smbios_data = CLOUD_DS.format(DS_HOST, DS_PORT, UUID(bytes=domain_uuid))
 # condition: True
 # system_info:
 #   default_user:
-
-
-
 
 # Generate meta-data
 # TODO: Create sample helper code to expose user-data
