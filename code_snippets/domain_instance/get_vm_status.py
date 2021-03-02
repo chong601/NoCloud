@@ -117,39 +117,26 @@ try:
         # VIR_DOMAIN_PAUSED_LAST 	            = 	14 (0xe)    # this is useless
         #
         # }
-        if reason == libvirt.VIR_DOMAIN_PAUSED_UNKNOWN:
-            # HOW CAN YOU DON'T KNOW YOUR OWN PAUSED STATE?
-            print('Reason: Unknown')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_USER:
-            print('Reason: The instance is paused by user request')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_MIGRATION:
-            print('Reason: The instance is paused for offline migration')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_SAVE:
-            print('Reason: The instance is paused for save operation')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_DUMP:
-            print('Reason: The instance is paused for offline core dump')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_IOERROR:
-            print('Reason: The instance is paused due to I/O error')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_WATCHDOG:
-            print('Reason: The instance is paused due to watchdog event')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_FROM_SNAPSHOT:
-            print('Reason: The instance is paused after from a snapshot restore')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_SHUTTING_DOWN:
-            # NOTE: libvirt DO NOT KNOW if the host is shutting down, until the host signals it's about to go down
-            print('Reason: The instance is paused during shut down process')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_SNAPSHOT:
-            print('Reason: The instance is paused while creating a snapshot')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_CRASHED:
-            print('Reason: The instance is paused due to guest instance crashed')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_STARTING_UP:
-            # Wait what?
-            print('Reason: The instance is starting up from paused state')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_POSTCOPY:
-            print('Reason: The instance is paused for post-copy operation')
-        elif reason == libvirt.VIR_DOMAIN_PAUSED_POSTCOPY_FAILED:
-            print('Reason: The instance is paused after a faied post-copy operation')
+        msg = {
+            libvirt.VIR_DOMAIN_PAUSED_UNKNOWN: "Unknown",
+            libvirt.VIR_DOMAIN_PAUSED_USER: "The instance is paused by user request",
+            libvirt.VIR_DOMAIN_PAUSED_MIGRATION: "The instance is paused for offline migration",
+            libvirt.VIR_DOMAIN_PAUSED_SAVE: "The instance is paused for save operation",
+            libvirt.VIR_DOMAIN_PAUSED_DUMP: "The instance is paused for offline core dump",
+            libvirt.VIR_DOMAIN_PAUSED_IOERROR: "The instance is paused due to I/O error",
+            libvirt.VIR_DOMAIN_PAUSED_WATCHDOG: "The instance is paused due to watchdog event",
+            libvirt.VIR_DOMAIN_PAUSED_FROM_SNAPSHOT: "The instance is paused after from a snapshot restore",
+            libvirt.VIR_DOMAIN_PAUSED_SHUTTING_DOWN: "The instance is paused during shut down process", # NOTE: libvirt DOES NOT KNOW if the host is shutting down, until the host signals it's about to go down
+            libvirt.VIR_DOMAIN_PAUSED_SNAPSHOT: "The instance is paused while creating a snapshot",
+            libvirt.VIR_DOMAIN_PAUSED_CRASHED: "The instance is paused because the guest instance crashed",
+            libvirt.VIR_DOMAIN_PAUSED_STARTING_UP: "The instance is starting up from paused state",
+            libvirt.VIR_DOMAIN_PAUSED_POSTCOPY: "The instance is paused for post-copy operation",
+            libvirt.VIR_DOMAIN_PAUSED_POSTCOPY_FAILED: "The instance is paused after a faied post-copy operation"
+        }.get(reason)
+        if not msg:
+            print("New state has been defined by upstream libvirt. Please raise a bug with us")
         else:
-            print('New state has been defined by upstream libvirt. Please raise a bug with us')
+            print(f"Reason: {msg}")
     # Shut down state != Shut off state
     # Shut down state means it's currently shutting down
     # Also, due to how libvirt works. you don't know if the domain has started shutting down until **the guest informs
@@ -189,26 +176,21 @@ try:
         # VIR_DOMAIN_SHUTOFF_LAST 		    = 	9 (0x9)     # this is useless
         #
         # }
-        if reason == libvirt.VIR_DOMAIN_SHUTOFF_UNKNOWN:
-            print('Reason: Unknown')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_SHUTDOWN:
-            print('Reason: The domain was shutted down normally')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_DESTROYED:
-            print('Reason: The domain was shutted down using force shut down method')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_CRASHED:
-            print('Reason: The domain was shutted down due to a crash')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_MIGRATED:
-            print('Reason: The domain was shutted down normally')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_SAVED:
-            print('Reason: The domain was shutted down normally')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_FAILED:
-            print('Reason: The domain was shutted down normally')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_FROM_SNAPSHOT:
-            print('Reason: The domain was shutted down normally')
-        elif reason == libvirt.VIR_DOMAIN_SHUTOFF_DAEMON:
-            print('Reason: The domain was shutted down normally')
-
-
+        msg = {
+            libvirt.VIR_DOMAIN_SHUTOFF_UNKNOWN: "Unknown"
+            libvirt.VIR_DOMAIN_SHUTOFF_SHUTDOWN: "The domain was shut down normally"
+            libvirt.VIR_DOMAIN_SHUTOFF_DESTROYED: "The domain was shut down using force shut down method"
+            libvirt.VIR_DOMAIN_SHUTOFF_CRASHED: "The domain was shut down due to a crash"
+            libvirt.VIR_DOMAIN_SHUTOFF_MIGRATED: "The domain was shut down normally"
+            libvirt.VIR_DOMAIN_SHUTOFF_SAVED: "The domain was shut down normally"
+            libvirt.VIR_DOMAIN_SHUTOFF_FAILED: "The domain was shut down normally"
+            libvirt.VIR_DOMAIN_SHUTOFF_FROM_SNAPSHOT: "The domain was shut down normally"
+            libvirt.VIR_DOMAIN_SHUTOFF_DAEMON: "The domain was shut down normally"
+        }.get(reason)
+        if not msg:
+            print("New state has been defined by upstream libvirt. Please raise a bug with us")
+        else:
+            print(f"Reason: {msg}")
 
 
 
