@@ -72,7 +72,7 @@ if DISK_TYPE == 'qcow2':
         return_code = call_qemu_img(destination_path, DISK_TYPE, DISK_SIZE, METADATA_PREALLOCATION)
 
         # VERY UNTESTED. DO NOT BLINDLY RUN THIS.
-        volume_libvirt = pool.createXML(volume_xml, libvirt.VOL_CREATE)
+        volume_libvirt = pool.createXML(volume_xml)
     else:
         if METADATA_PREALLOCATION == libvirt.VIR_STORAGE_VOL_CREATE_PREALLOC_METADATA:
             volume_libvirt = pool.createXML(volume_xml, libvirt.VIR_STORAGE_VOL_CREATE_PREALLOC_METADATA)
