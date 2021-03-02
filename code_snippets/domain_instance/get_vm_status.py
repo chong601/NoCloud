@@ -177,14 +177,14 @@ try:
         #
         # }
         msg = {
-            libvirt.VIR_DOMAIN_SHUTOFF_UNKNOWN: "Unknown"
-            libvirt.VIR_DOMAIN_SHUTOFF_SHUTDOWN: "The domain was shut down normally"
-            libvirt.VIR_DOMAIN_SHUTOFF_DESTROYED: "The domain was shut down using force shut down method"
-            libvirt.VIR_DOMAIN_SHUTOFF_CRASHED: "The domain was shut down due to a crash"
-            libvirt.VIR_DOMAIN_SHUTOFF_MIGRATED: "The domain was shut down normally"
-            libvirt.VIR_DOMAIN_SHUTOFF_SAVED: "The domain was shut down normally"
-            libvirt.VIR_DOMAIN_SHUTOFF_FAILED: "The domain was shut down normally"
-            libvirt.VIR_DOMAIN_SHUTOFF_FROM_SNAPSHOT: "The domain was shut down normally"
+            libvirt.VIR_DOMAIN_SHUTOFF_UNKNOWN: "Unknown",
+            libvirt.VIR_DOMAIN_SHUTOFF_SHUTDOWN: "The domain was shut down normally",
+            libvirt.VIR_DOMAIN_SHUTOFF_DESTROYED: "The domain was shut down using force shut down method",
+            libvirt.VIR_DOMAIN_SHUTOFF_CRASHED: "The domain was shut down due to a crash",
+            libvirt.VIR_DOMAIN_SHUTOFF_MIGRATED: "The domain was shut down normally",
+            libvirt.VIR_DOMAIN_SHUTOFF_SAVED: "The domain was shut down normally",
+            libvirt.VIR_DOMAIN_SHUTOFF_FAILED: "The domain was shut down normally",
+            libvirt.VIR_DOMAIN_SHUTOFF_FROM_SNAPSHOT: "The domain was shut down normally",
             libvirt.VIR_DOMAIN_SHUTOFF_DAEMON: "The domain was shut down normally"
         }.get(reason)
         if not msg:
