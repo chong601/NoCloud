@@ -23,6 +23,7 @@ ERR_VOLUME_NOT_FOUND = 'Volume "{}" is not found in pool "{}".'
 ERR_DOMAIN_NOT_FOUND = 'Domain "{}" is not found.'
 
 # Parameters
+LIBVIRT_URI = 'qemu+ssh://chong601@10.102.0.5/system'
 MEGABYTES = 1024**2
 GIGABYTES = 1024**3
 
@@ -31,14 +32,19 @@ CLOUD_DS = 'ds=nocloud-net;s=http://{}:{}/{}/'
 DISK_NAME = 'disk-2.img'
 DISK_TYPE = 'qcow2'
 DISK_CAPACITY = 100*GIGABYTES
+
 HOST_FILESYSTEM = 'zfs'
-POOL_NAME = 'vm-ubuntu-focal-lxd-1'
+POOL_NAME = 'vm-ubuntu-focal-cloud-init-test-4'
+POOL_TYPE = 'dir'
+TARGET_PATH = '/zfs-storage-test/kvm-area/{}'.format(DOMAIN_NAME)
+POOL_AUTOSTART = 1
+ZFS_IS_DATASET = True
 
 EMULATION_TYPE = 'kvm'
-MEMORY_CAPACITY = 4*GIGABYTES
-MAX_MEMORY_CAPACITY = 16*GIGABYTES
+MEMORY_CAPACITY = 4
+MAX_MEMORY_CAPACITY = 16
 PROVISIONED_CPU_COUNT = 4
-HOST_CPU_COUNT = 16
+HOST_CPU_COUNT = 24
 VM_UUID = str(uuid4())
 SOCKET_COUNT = 1
 CORE_COUNT = 24
@@ -59,15 +65,37 @@ j2_env = Environment(
     autoescape=select_autoescape(ENABLED_ESCAPES)
 )
 
-client = libvirt.open("qemu+ssh://chong601@10.102.0.5/system")
-
+print('Connecting to libvirt host at {}...'.format(LIBVIRT_URI))
+client = libvirt.open(LIBVIRT_URI)
+print('libvirt host "{}" connected.'.format(client.getHostname()))
 # Clone the VM pool
-subprocess.run([])
+# TODO: Paramiko integration
+# subprocess.run([])
 
 # Create a new pool
 # TODO: write pool storage code
+# XML GENERATION TIME *shudders*
+print('Generating new pool definition for pool name {}...'.format(POOL_NAME))
+pool_attr = {'type': POOL_TYPE}
+pool_root = ElementTree.Element('pool', pool_attr)
+pool_name = ElementTree.SubElement(pool_root, 'name').text = POOL_NAME
+pool_target = ElementTree.SubElement(pool_root, 'target')
+pool_target_path = ElementTree.SubElement(pool_target, 'path').text = TARGET_PATH
+
+pool_xml = ElementTree.tostring(pool_root, 'unicode')
+print(pool_xml)
+print('Pool definition complete.')
+print('Informing {} to create pool "{}"...'.format(client.getHostname(), POOL_NAME))
+client.storagePoolDefineXML(pool_xml)
+print('Pool {} is create at {}.'.format(POOL_NAME, client.getHostname()))
+
+print('Informing {} to set pool "{}" to autostart...')
+pool_obj = client.storagePoolLookupByName(POOL_NAME)
+pool_obj.setAutostart(POOL_AUTOSTART)
+print('Pool {} at {} autostarted'.format(POOL_NAME, client.getHostname()))
 
 # Define a new volume for libvirt to monitor
+print('Generating definitions for volume {}"...'.format(DISK_NAME))
 volume = ElementTree.Element('volume')
 name = ElementTree.SubElement(volume, 'name').text = DISK_NAME
 capacity = ElementTree.SubElement(volume, 'capacity').text = str(DISK_CAPACITY)
@@ -75,6 +103,7 @@ target = ElementTree.SubElement(volume, 'target')
 # format_attr has type which is the type of disk to create eg: raw, bochs, qcow, qcow2, qed, vmdk
 format_attr = {'type': DISK_TYPE}
 disk_format = ElementTree.SubElement(target, 'format', format_attr)
+
 
 
 # TODO: look into key
@@ -85,21 +114,32 @@ def call_qemu_img(self, source, dest, target_disk_format, disk_capacity, allocat
 volume_xml = ElementTree.tostring(volume, 'unicode')
 print(volume_xml)
 pool = client.storagePoolLookupByName(POOL_NAME)
+print('Generation complete.')
 
+print('Adding volume "{}" to pool "{}" at "{}"')
 # WARNING: ZFS DO NOT support falloc method of disk allocation
 # TODO: add more disk type for other filesystems
 if DISK_TYPE == 'qcow2':
-    if HOST_FILESYSTEM == 'zfs':
+    if HOST_FILESYSTEM == 'zfs' and ZFS_IS_DATASET:
         # TODO: ZFS-specific metadata preallocation
         # FUCK YOU LIBVIRT
         # call_qemu_img(source,dest,target_disk_format,disk_capacity,'metadata')
-        pass
+        try:
+            pool = client.storagePoolLookupByName(POOL_NAME)
+        except libvirt.libvirtError:
+            print(ERR_POOL_NOT_FOUND.format(POOL_NAME))
+            exit(1)
+        if pool.isActive() == libvirt.VIR_STORAGE_POOL_INACTIVE:
+            pool.create()
+        volume_libvirt = pool.createXML(volume_xml)
     else:
-        volume_libvirt = pool.createXML(volume_xml, libvirt.VIR_STORAGE_VOL_CREATE_PREALLOC_METADATA)
+        volume_libvirt = pool.createXML(volume_xml)
 else:
     print("Storage type is not implemented (yet)")
+print('Volume "{}" is created on pool "{}" at "{}"'.format(DISK_NAME, POOL_NAME, client.getHostname()))
 # Expand the disk to appropriate size
 # TODO: write vol-resize code
+print('Informing host "{}" to resize volume "{}" to {} bytes...'.format(client.getHostname(), DISK_NAME, DISK_CAPACITY))
 pool = disk = None
 
 try:
@@ -127,6 +167,7 @@ except libvirt.libvirtError:
 # This is the right place to use absolute size resizing.
 # TODO: do proper size checks before blindly resizing them
 disk.resize(DISK_CAPACITY, libvirt.VIR_STORAGE_VOL_RESIZE_DELTA)
+print('Volume resize done.')
 
 # Generate domain XML
 # TODO: complete Jinja2 XML implementation
@@ -140,12 +181,17 @@ disk.resize(DISK_CAPACITY, libvirt.VIR_STORAGE_VOL_RESIZE_DELTA)
 # - XML is hateful
 # - XML APIs forced me to do this
 # - the fact that libvirt **ENFORCES** the need to use XML which is just asinine
+print('Generating domain definition for domain "{}"...'.format(DOMAIN_NAME))
 domain_attr = {'type': EMULATION_TYPE}
 xml_domain = ElementTree.Element('domain', domain_attr)
 xml_name = ElementTree.SubElement(xml_domain, 'name').text = DOMAIN_NAME
 xml_uuid = ElementTree.SubElement(xml_domain, 'uuid').text = VM_UUID
-xml_memory = ElementTree.SubElement(xml_domain, 'memory').text = str(MAX_MEMORY_CAPACITY)
-xml_current_memory = ElementTree.SubElement(xml_domain, 'currentMemory').text = str(MEMORY_CAPACITY)
+# Memory attributes are **strictly** required because it defaults to KiB
+# 10/10 libvirt, assuming that people actually use KiB to define memory.
+memory_attr = {'unit': 'GiB'}
+xml_memory = ElementTree.SubElement(xml_domain, 'memory', memory_attr).text = str(MAX_MEMORY_CAPACITY)
+current_memory_attr = {'unit': 'GiB'}
+xml_current_memory = ElementTree.SubElement(xml_domain, 'currentMemory', current_memory_attr).text = str(MEMORY_CAPACITY)
 vcpu_attr = {'current': str(PROVISIONED_CPU_COUNT)}
 xml_vcpu = ElementTree.SubElement(xml_domain, 'vcpu', vcpu_attr).text = str(HOST_CPU_COUNT)
 xml_os = ElementTree.SubElement(xml_domain, 'os')
@@ -155,7 +201,8 @@ os_type_attr = {'arch': 'x86_64', 'machine': 'q35'}
 xml_os_type = ElementTree.SubElement(xml_os, 'type', os_type_attr).text = 'hvm'
 os_boot_attr = {'dev': 'hd'}
 xml_os_boot = ElementTree.SubElement(xml_os, 'boot', os_boot_attr)
-xml_sysinfo = ElementTree.SubElement(xml_domain, 'sysinfo')
+sysinfo_attr = {'type': 'smbios'}
+xml_sysinfo = ElementTree.SubElement(xml_domain, 'sysinfo', sysinfo_attr)
 xml_sysinfo_bios = ElementTree.SubElement(xml_sysinfo, 'bios')
 sysinfo_bios_vendor_attr = {'name': 'vendor'}
 xml_sysinfo_bios_entry = ElementTree.SubElement(xml_sysinfo_bios, 'entry', sysinfo_bios_vendor_attr).text = BIOS_VENDOR
@@ -243,6 +290,8 @@ devices_rng_backend_attr = {'model': 'random'}
 xml_devices_rng_backend = ElementTree.SubElement(xml_devices_rng, 'backend', devices_rng_backend_attr).text = '/dev/urandom'
 
 xml_str = ElementTree.tostring(xml_domain, 'unicode')
+print('Generation complete.')
+print('Defining domain {} at {}'.format(DOMAIN_NAME, client.getHostname()))
 domain = client.defineXML(xml_str)
 
 
@@ -303,3 +352,6 @@ except libvirt.libvirtError:
 
 # Start domain
 # TODO: write domain lifecycle code
+print('Starting domain {} at {}'.format(DOMAIN_NAME, client.getHostname()))
+domain.create()
+print('Domain {} is started at {}'.format(DOMAIN_NAME, client.getHostname()))
