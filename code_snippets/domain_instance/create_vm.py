@@ -89,7 +89,7 @@ print('Informing {} to create pool "{}"...'.format(client.getHostname(), POOL_NA
 client.storagePoolDefineXML(pool_xml)
 print('Pool {} is create at {}.'.format(POOL_NAME, client.getHostname()))
 
-print('Informing {} to set pool "{}" to autostart...')
+print('Informing {} to set pool "{}" to autostart...'.format(client.getHostname(), POOL_NAME))
 pool_obj = client.storagePoolLookupByName(POOL_NAME)
 pool_obj.setAutostart(POOL_AUTOSTART)
 print('Pool {} at {} autostarted'.format(POOL_NAME, client.getHostname()))
@@ -116,7 +116,7 @@ print(volume_xml)
 pool = client.storagePoolLookupByName(POOL_NAME)
 print('Generation complete.')
 
-print('Adding volume "{}" to pool "{}" at "{}"')
+print('Adding volume "{}" to pool "{}" at "{}"'.format(DISK_NAME, POOL_NAME, client.getHostname()))
 # WARNING: ZFS DO NOT support falloc method of disk allocation
 # TODO: add more disk type for other filesystems
 if DISK_TYPE == 'qcow2':
