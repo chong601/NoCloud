@@ -1,6 +1,7 @@
 import libvirt
 
 
+# Finally a functional and usablle libvirt exception system that doesn't suck.
 class FuckYouLibvirtError(Exception):
 
     VIR_ERR_NUMBER_DICT = {
@@ -187,119 +188,354 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_ERR_NO_SECURITY_MODEL: 'Security model not found',
         # operation is not applicable at this time
         # VIR_ERR_OPERATION_INVALID 	= 	55 (0x37)
-        libvirt.VIR_ERR_OPERATION_INVALID: 'The operation is not applicable right now'
+        libvirt.VIR_ERR_OPERATION_INVALID: 'The operation is not applicable right now',
         # failed to start interface driver
         # VIR_WAR_NO_INTERFACE 	= 	56 (0x38)
+        libvirt.VIR_WAR_NO_INTERFACE: 'Interface driver failed to start',
         # interface driver not running
         # VIR_ERR_NO_INTERFACE 	= 	57 (0x39)
+        libvirt.VIR_ERR_NO_INTERFACE: 'Interface driver is not running',
         # invalid interface object
         # VIR_ERR_INVALID_INTERFACE 	= 	58 (0x3a)
+        libvirt.VIR_ERR_INVALID_INTERFACE: 'The interface object is invalid',
         # more than one matching interface found
         # VIR_ERR_MULTIPLE_INTERFACES 	= 	59 (0x3b)
+        libvirt.VIR_ERR_MULTIPLE_INTERFACES: 'Multiple interfaces are found',
         # failed to start nwfilter driver
         # VIR_WAR_NO_NWFILTER 	= 	60 (0x3c)
+        libvirt.VIR_WAR_NO_NWFILTER: 'Network filter driver failed to start',
         # invalid nwfilter object
         # VIR_ERR_INVALID_NWFILTER 	= 	61 (0x3d)
+        libvirt.VIR_ERR_INVALID_NWFILTER: 'The network filter object is invalid',
         # nw filter pool not found
         # VIR_ERR_NO_NWFILTER 	= 	62 (0x3e)
+        libvirt.VIR_ERR_NO_NWFILTER: 'Network filter pool not found',
         # nw filter pool not found
         # VIR_ERR_BUILD_FIREWALL 	= 	63 (0x3f)
+        # FIXME: is this related to unable to build firewall?
+        libvirt.VIR_ERR_BUILD_FIREWALL: 'Unable to build firewall rules',
         # failed to start secret storage
         # VIR_WAR_NO_SECRET 	= 	64 (0x40)
+        libvirt.VIR_WAR_NO_SECRET: 'Warning: Failed to start libvirt secret storage',
         # invalid secret
         # VIR_ERR_INVALID_SECRET 	= 	65 (0x41)
+        libvirt.VIR_ERR_INVALID_SECRET: 'Invalid secret',
         # secret not found
         # VIR_ERR_NO_SECRET 	= 	66 (0x42)
+        libvirt.VIR_ERR_NO_SECRET: 'Requested secret is not found',
         # unsupported configuration construct
         # VIR_ERR_CONFIG_UNSUPPORTED 	= 	67 (0x43)
+        libvirt.VIR_ERR_CONFIG_UNSUPPORTED: 'Unsupported configuration',
         # timeout occurred during operation
         # VIR_ERR_OPERATION_TIMEOUT 	= 	68 (0x44)
+        libvirt.VIR_ERR_OPERATION_TIMEOUT: 'Time occurred during operation',
         # a migration worked, but making the VM persist on the dest host failed
         # VIR_ERR_MIGRATE_PERSIST_FAILED 	= 	69 (0x45)
+        libvirt.VIR_ERR_MIGRATE_PERSIST_FAILED: 'Unable to persist migrated domain',
         # a synchronous hook script failed
         # VIR_ERR_HOOK_SCRIPT_FAILED 	= 	70 (0x46)
+        libvirt.VIR_ERR_HOOK_SCRIPT_FAILED: 'A synchronous hook script failed',
         # invalid domain snapshot
         # VIR_ERR_INVALID_DOMAIN_SNAPSHOT 	= 	71 (0x47)
+        # FIXME: put a valid message
+        libvirt.VIR_ERR_INVALID_DOMAIN_SNAPSHOT: 'Invalid domain snapshot',
         # domain snapshot not found
         # VIR_ERR_NO_DOMAIN_SNAPSHOT 	= 	72 (0x48)
+        libvirt.VIR_ERR_NO_DOMAIN_SNAPSHOT: 'Domain snapshot not found',
         # stream pointer not valid
         # VIR_ERR_INVALID_STREAM 	= 	73 (0x49)
+        # FIXME: define a better message
+        libvirt.VIR_ERR_INVALID_STREAM: 'Stream pointer is not valid',
         # valid API use but unsupported by the given driver
         # VIR_ERR_ARGUMENT_UNSUPPORTED 	= 	74 (0x4a)
+        libvirt.VIR_ERR_ARGUMENT_UNSUPPORTED: 'This API is not supported by the driver',
         # storage pool probe failed
         # VIR_ERR_STORAGE_PROBE_FAILED 	= 	75 (0x4b)
+        libvirt.VIR_ERR_STORAGE_PROBE_FAILED: 'Failed to probe storage pool',
         # storage pool already built
         # VIR_ERR_STORAGE_POOL_BUILT 	= 	76 (0x4c)
+        libvirt.VIR_ERR_STORAGE_POOL_BUILT: 'The storage pool already exists',
         # force was not requested for a risky domain snapshot revert
         # VIR_ERR_SNAPSHOT_REVERT_RISKY 	= 	77 (0x4d)
+        libvirt.VIR_ERR_SNAPSHOT_REVERT_RISKY: 'A mandatory force command is required for this snapshot restore',
         # operation on a domain was canceled/aborted by user
         # VIR_ERR_OPERATION_ABORTED 	= 	78 (0x4e)
+        libvirt.VIR_ERR_OPERATION_ABORTED: 'Domain operation was cancelled or aborted by user',
         # authentication cancelled
         # VIR_ERR_AUTH_CANCELLED 	= 	79 (0x4f)
+        libvirt.VIR_ERR_AUTH_CANCELLED: 'An authentication operation was cancelled',
         # The metadata is not present
         # VIR_ERR_NO_DOMAIN_METADATA 	= 	80 (0x50)
+        libvirt.VIR_ERR_NO_DOMAIN_METADATA: 'Domain metadata is not found',
         # Migration is not safe
         # VIR_ERR_MIGRATE_UNSAFE 	= 	81 (0x51)
+        libvirt.VIR_ERR_MIGRATE_UNSAFE: 'Domain migration is not safe for current state',
         # integer overflow
         # VIR_ERR_OVERFLOW 	= 	82 (0x52)
+        libvirt.VIR_ERR_OVERFLOW: 'Integer overflow is detected',
         # action prevented by block copy job
         # VIR_ERR_BLOCK_COPY_ACTIVE 	= 	83 (0x53)
+        libvirt.VIR_ERR_BLOCK_COPY_ACTIVE: 'Requested operation was not performed due to an active block copy operation',
         # The requested operation is not supported
         # VIR_ERR_OPERATION_UNSUPPORTED 	= 	84 (0x54)
+        libvirt.VIR_ERR_OPERATION_UNSUPPORTED: 'Requested operation was unsupported',
         # error in ssh transport driver
         # VIR_ERR_SSH 	= 	85 (0x55)
+        libvirt.VIR_ERR_SSH: 'An error was encountered on SSH transport driver',
         # guest agent is unresponsive, not running or not usable
         # VIR_ERR_AGENT_UNRESPONSIVE 	= 	86 (0x56)
+        libvirt.VIR_ERR_AGENT_UNRESPONSIVE: 'Guest agent on this domain is unresponsive, not running, installed or usable',
         # resource is already in use
         # VIR_ERR_RESOURCE_BUSY 	= 	87 (0x57)
+        libvirt.VIR_ERR_RESOURCE_BUSY: 'Requested resource is currently in use',
         # operation on the object/resource was denied
         # VIR_ERR_ACCESS_DENIED 	= 	88 (0x58)
+        libvirt.VIR_ERR_ACCESS_DENIED: 'Access denied when accessing an object or resource',
         # error from a dbus service
         # VIR_ERR_DBUS_SERVICE 	= 	89 (0x59)
+        libvirt.VIR_ERR_DBUS_SERVICE: 'An error occured from the D-Bus service',
         # the storage vol already exists
         # VIR_ERR_STORAGE_VOL_EXIST 	= 	90 (0x5a)
+        libvirt.VIR_ERR_STORAGE_VOL_EXIST: 'Storage volume already exists',
         # given CPU is incompatible with host CPU
         # VIR_ERR_CPU_INCOMPATIBLE 	= 	91 (0x5b)
+        libvirt.VIR_ERR_CPU_INCOMPATIBLE: 'The provided CPU configuration is not compatible with the host CPU configuration',
         # XML document doesn't validate against schema
         # VIR_ERR_XML_INVALID_SCHEMA 	= 	92 (0x5c)
+        libvirt.VIR_ERR_XML_INVALID_SCHEMA: 'XML validation failed due to invalid schema',
         # Finish API succeeded but it is expected to return NULL
         # VIR_ERR_MIGRATE_FINISH_OK 	= 	93 (0x5d)
+        # Bruh what
+        libvirt.VIR_ERR_MIGRATE_FINISH_OK: 'Migration completed, but received unexpected data (expected NULL)',
         # authentication unavailable
         # VIR_ERR_AUTH_UNAVAILABLE 	= 	94 (0x5e)
+        libvirt.VIR_ERR_AUTH_UNAVAILABLE: 'Authentication is currently unavailable',
         # Server was not found
         # VIR_ERR_NO_SERVER 	= 	95 (0x5f)
+        libvirt.VIR_ERR_NO_SERVER: 'Server was not found',
         # Client was not found
         # VIR_ERR_NO_CLIENT 	= 	96 (0x60)
+        libvirt.VIR_ERR_NO_CLIENT: 'Client was not found',
         # guest agent replies with wrong id to guest-sync command (DEPRECATED)
         # VIR_ERR_AGENT_UNSYNCED 	= 	97 (0x61)
+        libvirt.VIR_ERR_AGENT_UNSYNCED: 'DEPRECATED: Guest agent replied with a wrong ID for a guest-sync command',
         # error in libssh transport driver
         # VIR_ERR_LIBSSH 	= 	98 (0x62)
+        libvirt.VIR_ERR_LIBSSH: 'An error occurred on libSSH transport driver',
         # fail to find the desired device
         # VIR_ERR_DEVICE_MISSING 	= 	99 (0x63)
+        libvirt.VIR_ERR_DEVICE_MISSING: 'Device is not found',
         # invalid nwfilter binding
         # VIR_ERR_INVALID_NWFILTER_BINDING 	= 	100 (0x64)
+        libvirt.VIR_ERR_INVALID_NWFILTER_BINDING: 'Invalid network filter binding',
         # no nwfilter binding
         # VIR_ERR_NO_NWFILTER_BINDING 	= 	101 (0x65)
+        libvirt.VIR_ERR_NO_NWFILTER_BINDING: 'Network filter binding not found',
         # invalid domain checkpoint
         # VIR_ERR_INVALID_DOMAIN_CHECKPOINT 	= 	102 (0x66)
+        libvirt.VIR_ERR_INVALID_DOMAIN_CHECKPOINT: 'Invalid domain checkpoint',
         # domain checkpoint not found
         # VIR_ERR_NO_DOMAIN_CHECKPOINT 	= 	103 (0x67)
+        libvirt.VIR_ERR_NO_DOMAIN_CHECKPOINT: 'Requested domain checkpoint not found',
         # domain backup job id not found
         # VIR_ERR_NO_DOMAIN_BACKUP 	= 	104 (0x68)
+        libvirt.VIR_ERR_NO_DOMAIN_BACKUP: 'Domain backup not found',
         # invalid network port object
         # VIR_ERR_INVALID_NETWORK_PORT 	= 	105 (0x69)
+        libvirt.VIR_ERR_INVALID_NETWORK_PORT: 'Invalid network port',
         # the network port already exist
         # VIR_ERR_NETWORK_PORT_EXIST 	= 	106 (0x6a)
+        libvirt.VIR_ERR_NETWORK_PORT_EXIST: 'The network port already exists',
         # network port not found
         # VIR_ERR_NO_NETWORK_PORT 	= 	107 (0x6b)
+        libvirt.VIR_ERR_NO_NETWORK_PORT: 'Network port not found',
         # no domain's hostname found
         # VIR_ERR_NO_HOSTNAME 	= 	108 (0x6c)
+        # UHHHHHH WHY IS IT NOT FOUND
+
         # checkpoint can't be used
         # VIR_ERR_CHECKPOINT_INCONSISTENT 	= 	109 (0x6d)
+        # THIS IS MISSING TOO
+
         # more than one matching domain found
         # VIR_ERR_MULTIPLE_DOMAINS 	= 	110 (0x6e)
+
         # THE END OF ERROR STRUCT
         # VIR_ERR_NUMBER_LAST 	= 	111 (0x6f)
         #
+        # }
+    }
+
+    VIR_ERR_DOMAIN_DICT = {
+        # enum virErrorDomain {
+        # VIR_FROM_NONE 	= 	0 (0x0)
+        # Error at Xen hypervisor layer
+        # VIR_FROM_XEN 	= 	1 (0x1)
+        libvirt.VIR_FROM_XEN: 'Error from Xen hypervisor',
+        # Error at connection with xend daemon
+        # VIR_FROM_XEND 	= 	2 (0x2)
+        libvirt.VIR_FROM_XEND: 'Error from Xend daemon',
+        # Error at connection with xen store
+        # VIR_FROM_XENSTORE 	= 	3 (0x3)
+        libvirt.VIR_FROM_XENSTORE: 'Error from Xen Store',
+        # Error in the S-Expression code
+        # VIR_FROM_SEXPR 	= 	4 (0x4)
+        libvirt.VIR_FROM_SEXPR: 'Error from S-Expression',
+        # Error in the XML code
+        # VIR_FROM_XML 	= 	5 (0x5)
+        libvirt.VIR_FROM_XML: 'Error from XML code',
+        # Error when operating on a domain
+        # VIR_FROM_DOM 	= 	6 (0x6)
+        libvirt.VIR_FROM_DOM: 'Error from domain management',
+        # Error in the XML-RPC code
+        # VIR_FROM_RPC 	= 	7 (0x7)
+        libvirt.VIR_FROM_RPC: 'Error from XML-RPC',
+        # Error in the proxy code; unused since 0.8.6
+        # VIR_FROM_PROXY 	= 	8 (0x8)
+        libvirt.VIR_FROM_PROXY: 'Error from proxy',
+        # Error in the configuration file handling
+        # VIR_FROM_CONF 	= 	9 (0x9)
+        libvirt.VIR_FROM_CONF: 'Error from configuration file handling',
+        # Error at the QEMU daemon
+        # VIR_FROM_QEMU 	= 	10 (0xa)
+        libvirt.VIR_FROM_QEMU: 'Error from QEMU daemon'
+        # Error when operating on a network
+        # VIR_FROM_NET 	= 	11 (0xb)
+        # Error from test driver
+        # VIR_FROM_TEST 	= 	12 (0xc)
+        # Error from remote driver
+        # VIR_FROM_REMOTE 	= 	13 (0xd)
+        # Error from OpenVZ driver
+        # VIR_FROM_OPENVZ 	= 	14 (0xe)
+        # Error at Xen XM layer
+        # VIR_FROM_XENXM 	= 	15 (0xf)
+        # Error in the Linux Stats code
+        # VIR_FROM_STATS_LINUX 	= 	16 (0x10)
+        # Error from Linux Container driver
+        # VIR_FROM_LXC 	= 	17 (0x11)
+        # Error from storage driver
+        # VIR_FROM_STORAGE 	= 	18 (0x12)
+        # Error from network config
+        # VIR_FROM_NETWORK 	= 	19 (0x13)
+        # Error from domain config
+        # VIR_FROM_DOMAIN 	= 	20 (0x14)
+        # Error at the UML driver; unused since 5.0.0
+        # VIR_FROM_UML 	= 	21 (0x15)
+        # Error from node device monitor
+        # VIR_FROM_NODEDEV 	= 	22 (0x16)
+        # Error from xen inotify layer
+        # VIR_FROM_XEN_INOTIFY 	= 	23 (0x17)
+        # Error from security framework
+        # VIR_FROM_SECURITY 	= 	24 (0x18)
+        # Error from VirtualBox driver
+        # VIR_FROM_VBOX 	= 	25 (0x19)
+        # Error when operating on an interface
+        # VIR_FROM_INTERFACE 	= 	26 (0x1a)
+        # The OpenNebula driver no longer exists. Retained for ABI/API compat only
+        # VIR_FROM_ONE 	= 	27 (0x1b)
+        # Error from ESX driver
+        # VIR_FROM_ESX 	= 	28 (0x1c)
+        # Error from the phyp driver, unused since 6.0.0
+        # VIR_FROM_PHYP 	= 	29 (0x1d)
+        # Error from secret storage
+        # VIR_FROM_SECRET 	= 	30 (0x1e)
+        # Error from CPU driver
+        # VIR_FROM_CPU 	= 	31 (0x1f)
+        # Error from XenAPI
+        # VIR_FROM_XENAPI 	= 	32 (0x20)
+        # Error from network filter driver
+        # VIR_FROM_NWFILTER 	= 	33 (0x21)
+        # Error from Synchronous hooks
+        # VIR_FROM_HOOK 	= 	34 (0x22)
+        # Error from domain snapshot
+        # VIR_FROM_DOMAIN_SNAPSHOT 	= 	35 (0x23)
+        # Error from auditing subsystem
+        # VIR_FROM_AUDIT 	= 	36 (0x24)
+        # Error from sysinfo/SMBIOS
+        # VIR_FROM_SYSINFO 	= 	37 (0x25)
+        # Error from I/O streams
+        # VIR_FROM_STREAMS 	= 	38 (0x26)
+        # Error from VMware driver
+        # VIR_FROM_VMWARE 	= 	39 (0x27)
+        # Error from event loop impl
+        # VIR_FROM_EVENT 	= 	40 (0x28)
+        # Error from libxenlight driver
+        # VIR_FROM_LIBXL 	= 	41 (0x29)
+        # Error from lock manager
+        # VIR_FROM_LOCKING 	= 	42 (0x2a)
+        # Error from Hyper-V driver
+        # VIR_FROM_HYPERV 	= 	43 (0x2b)
+        # Error from capabilities
+        # VIR_FROM_CAPABILITIES 	= 	44 (0x2c)
+        # Error from URI handling
+        # VIR_FROM_URI 	= 	45 (0x2d)
+        # Error from auth handling
+        # VIR_FROM_AUTH 	= 	46 (0x2e)
+        # Error from DBus
+        # VIR_FROM_DBUS 	= 	47 (0x2f)
+        # Error from Parallels
+        # VIR_FROM_PARALLELS 	= 	48 (0x30)
+        # Error from Device
+        # VIR_FROM_DEVICE 	= 	49 (0x31)
+        # Error from libssh2 connection transport
+        # VIR_FROM_SSH 	= 	50 (0x32)
+        # Error from lockspace
+        # VIR_FROM_LOCKSPACE 	= 	51 (0x33)
+        # Error from initctl device communication
+        # VIR_FROM_INITCTL 	= 	52 (0x34)
+        # Error from identity code
+        # VIR_FROM_IDENTITY 	= 	53 (0x35)
+        # Error from cgroups
+        # VIR_FROM_CGROUP 	= 	54 (0x36)
+        # Error from access control manager
+        # VIR_FROM_ACCESS 	= 	55 (0x37)
+        # Error from systemd code
+        # VIR_FROM_SYSTEMD 	= 	56 (0x38)
+        # Error from bhyve driver
+        # VIR_FROM_BHYVE 	= 	57 (0x39)
+        # Error from crypto code
+        # VIR_FROM_CRYPTO 	= 	58 (0x3a)
+        # Error from firewall
+        # VIR_FROM_FIREWALL 	= 	59 (0x3b)
+        # Error from polkit code
+        # VIR_FROM_POLKIT 	= 	60 (0x3c)
+        # Error from thread utils
+        # VIR_FROM_THREAD 	= 	61 (0x3d)
+        # Error from admin backend
+        # VIR_FROM_ADMIN 	= 	62 (0x3e)
+        # Error from log manager
+        # VIR_FROM_LOGGING 	= 	63 (0x3f)
+        # Error from Xen xl config code
+        # VIR_FROM_XENXL 	= 	64 (0x40)
+        # Error from perf
+        # VIR_FROM_PERF 	= 	65 (0x41)
+        # Error from libssh connection transport
+        # VIR_FROM_LIBSSH 	= 	66 (0x42)
+        # Error from resource control
+        # VIR_FROM_RESCTRL 	= 	67 (0x43)
+        # Error from firewalld
+        # VIR_FROM_FIREWALLD 	= 	68 (0x44)
+        # Error from domain checkpoint
+        # VIR_FROM_DOMAIN_CHECKPOINT 	= 	69 (0x45)
+        # Error from TPM
+        # VIR_FROM_TPM 	= 	70 (0x46)
+        # Error from BPF code
+        # VIR_FROM_BPF 	= 	71 (0x47)
+        #
+        # VIR_ERR_DOMAIN_LAST 	= 	72 (0x48)
+        #
+        # }
+    }
+
+    VIR_ERR_LEVEL_DICT = {
+        # enum virErrorLevel {
+        # VIR_ERR_NONE 	= 	0 (0x0)
+        libvirt.VIR_ERR_NONE: 'None',
+        # A simple warning
+        # VIR_ERR_WARNING 	= 	1 (0x1)
+        libvirt.VIR_ERR_WARNING: 'Warning',
+        # An error
+        # VIR_ERR_ERROR 	= 	2 (0x2)
+        libvirt.VIR_ERR_ERROR: 'Error'
         # }
     }
