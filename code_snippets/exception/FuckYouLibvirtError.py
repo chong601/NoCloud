@@ -398,65 +398,99 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_FROM_CONF: 'Error from configuration file handling',
         # Error at the QEMU daemon
         # VIR_FROM_QEMU 	= 	10 (0xa)
-        libvirt.VIR_FROM_QEMU: 'Error from QEMU daemon'
+        libvirt.VIR_FROM_QEMU: 'Error from QEMU daemon',
         # Error when operating on a network
         # VIR_FROM_NET 	= 	11 (0xb)
+        # FIXME: Check the use of this and rephrase the error message
+        libvirt.VIR_FROM_NET: 'Error from managing network',
         # Error from test driver
         # VIR_FROM_TEST 	= 	12 (0xc)
+        libvirt.VIR_FROM_TEST: 'Error from test driver',
         # Error from remote driver
         # VIR_FROM_REMOTE 	= 	13 (0xd)
+        libvirt.VIR_FROM_REMOTE: 'Error from remote driver',
         # Error from OpenVZ driver
         # VIR_FROM_OPENVZ 	= 	14 (0xe)
+        libvirt.VIR_FROM_OPENVZ: 'Error from OpenVZ driver',
         # Error at Xen XM layer
         # VIR_FROM_XENXM 	= 	15 (0xf)
+        libvirt.VIR_FROM_XENXM: 'Error from Xen XM layer',
         # Error in the Linux Stats code
         # VIR_FROM_STATS_LINUX 	= 	16 (0x10)
+        # FIXME: Rephrase this message as soon as the source is found
+        libvirt.VIR_FROM_STATS_LINUX: 'Error from Stats Linux',
         # Error from Linux Container driver
         # VIR_FROM_LXC 	= 	17 (0x11)
+        libvirt.VIR_FROM_LXC: 'Error from Linux Containers (LXC) driver',
         # Error from storage driver
         # VIR_FROM_STORAGE 	= 	18 (0x12)
+        libvirt.VIR_FROM_STORAGE: 'Error from storage driver',
         # Error from network config
         # VIR_FROM_NETWORK 	= 	19 (0x13)
+        libvirt.VIR_FROM_NETWORK: 'Error from network configuration',
         # Error from domain config
         # VIR_FROM_DOMAIN 	= 	20 (0x14)
+        libvirt.VIR_FROM_DOMAIN: 'Error from domain configuration',
         # Error at the UML driver; unused since 5.0.0
         # VIR_FROM_UML 	= 	21 (0x15)
+        libvirt.VIR_FROM_UML: 'Error from UML driver',
         # Error from node device monitor
         # VIR_FROM_NODEDEV 	= 	22 (0x16)
+        libvirt.VIR_FROM_NODEDEV: 'Error from node device monitor',
         # Error from xen inotify layer
         # VIR_FROM_XEN_INOTIFY 	= 	23 (0x17)
+        libvirt.VIR_FROM_XEN_INOTIFY: 'Error from Xen inotify layer',
         # Error from security framework
         # VIR_FROM_SECURITY 	= 	24 (0x18)
+        libvirt.VIR_FROM_SECURITY: 'Error from security',
         # Error from VirtualBox driver
         # VIR_FROM_VBOX 	= 	25 (0x19)
+        libvirt.VIR_FROM_VBOX: 'Error from VirtualBox driver',
         # Error when operating on an interface
         # VIR_FROM_INTERFACE 	= 	26 (0x1a)
+        # FIXME: Rewrite the message when the use of this domain is known
+        libvirt.VIR_FROM_INTERFACE: 'Error during modifying interface',
         # The OpenNebula driver no longer exists. Retained for ABI/API compat only
         # VIR_FROM_ONE 	= 	27 (0x1b)
+        # BYEBYE OpenNebula support
+        libvirt.VIR_FROM_ONE: 'Error from OpenNebula One driver',
         # Error from ESX driver
         # VIR_FROM_ESX 	= 	28 (0x1c)
+        libvirt.VIR_FROM_ESX: 'Error from ESX driver',
         # Error from the phyp driver, unused since 6.0.0
         # VIR_FROM_PHYP 	= 	29 (0x1d)
+        # I have NO IDEA that IBM made their own hypervisor. TIL.
+        libvirt.VIR_FROM_PHYP: 'Error from IBM POWER Hypervisor driver',
         # Error from secret storage
         # VIR_FROM_SECRET 	= 	30 (0x1e)
+        libvirt.VIR_FROM_SECRET: 'Error from secret storage subsystem',
         # Error from CPU driver
         # VIR_FROM_CPU 	= 	31 (0x1f)
+        libvirt.VIR_FROM_CPU: 'Error from CPU driver',
         # Error from XenAPI
         # VIR_FROM_XENAPI 	= 	32 (0x20)
+        libvirt.VIR_FROM_XENAPI: 'Error from Xen API (XAPI) driver',
         # Error from network filter driver
         # VIR_FROM_NWFILTER 	= 	33 (0x21)
+        libvirt.VIR_FROM_NWFILTER: 'Error from network filter driver',
         # Error from Synchronous hooks
         # VIR_FROM_HOOK 	= 	34 (0x22)
+        libvirt.VIR_FROM_HOOK: 'Error from synchronous hooks',
         # Error from domain snapshot
         # VIR_FROM_DOMAIN_SNAPSHOT 	= 	35 (0x23)
+        libvirt.VIR_FROM_DOMAIN_SNAPSHOT: 'Error from domain snapshot',
         # Error from auditing subsystem
         # VIR_FROM_AUDIT 	= 	36 (0x24)
+        libvirt.VIR_FROM_AUDIT: 'Error from audit subsystem',
         # Error from sysinfo/SMBIOS
         # VIR_FROM_SYSINFO 	= 	37 (0x25)
+        libvirt.VIR_FROM_SYSINFO: 'Error from sysinfo/SMBIOS',
         # Error from I/O streams
         # VIR_FROM_STREAMS 	= 	38 (0x26)
+        libvirt.VIR_FROM_STREAMS: 'Error from streams',
         # Error from VMware driver
         # VIR_FROM_VMWARE 	= 	39 (0x27)
+        libvirt.VIR_FROM_VMWARE: 'Error from VMware driver',
         # Error from event loop impl
         # VIR_FROM_EVENT 	= 	40 (0x28)
         # Error from libxenlight driver
@@ -540,8 +574,8 @@ class FuckYouLibvirtError(Exception):
         # }
     }
 
-    def __init__(self, errorDetails):
-        self._errorDetails = errorDetails
+    def __init__(self):
+        self._errorDetails = libvirt.virGetLastError()
         self.code, self.domain, self.message, self.level, self.str1, self.str2, self.str3, self.int1, self.int2 = self._errorDetails
 
     def getRawErrorDataFromLibvirt(self):
