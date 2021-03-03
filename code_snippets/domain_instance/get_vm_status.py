@@ -1,7 +1,7 @@
 import libvirt
 
 LIBVIRT_URI = 'qemu+ssh://chong601@10.102.0.5/system'
-DOMAIN_NAME = 'vm-ubuntu-focal-cloud-init-test-3'
+DOMAIN_NAME = 'vm-ubuntu-focal-cloud-init-test-5'
 
 ERR_STATE_MISSING_IN_DICT = 'New reason has been defined by upstream libvirt. Please raise a bug with us'
 ERR_REASON_MISSING_IN_DICT = 'New reason has been defined by upstream libvirt. Please raise a bug with us'
@@ -227,3 +227,4 @@ try:
 except libvirt.libvirtError:
     # TODO: check for errors
     print(libvirt.virGetLastError())
+
