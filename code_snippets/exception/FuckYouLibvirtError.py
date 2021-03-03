@@ -11,7 +11,7 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_ERR_OK: 'No errors',
         # internal error
         # VIR_ERR_INTERNAL_ERROR 	= 	1 (0x1)
-        libvirt.VIR_ERR_INTERNAL_ERROR: 'An internal error has occured',
+        libvirt.VIR_ERR_INTERNAL_ERROR: 'An internal error has occurred',
         # memory allocation failure
         # VIR_ERR_NO_MEMORY 	    = 	2 (0x2)
         libvirt.VIR_ERR_NO_MEMORY: 'Host {} has encountered an internal error',
@@ -55,7 +55,7 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_ERR_NO_XEN: 'Unable to open Xen hypervisor control interface',
         # failure doing an hypervisor call
         # VIR_ERR_XEN_CALL 	= 	15 (0xf)
-        libvirt.VIR_ERR_XEN_CALL: 'Error occured when attempting a Xen hypervisor call',
+        libvirt.VIR_ERR_XEN_CALL: 'Error occurred when attempting a Xen hypervisor call',
         # unknown OS type
         # VIR_ERR_OS_TYPE 	= 	16 (0x10)
         # FIXME: Check if this error message is related to missing details in domain XML
@@ -139,10 +139,10 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_ERR_SYSTEM_ERROR: 'The host encountered a system error',
         # some sort of RPC error
         # VIR_ERR_RPC 	= 	39 (0x27)
-        libvirt.VIR_ERR_RPC: 'An RPC error occured',
+        libvirt.VIR_ERR_RPC: 'An RPC error occurred',
         # error from a GNUTLS call
         # VIR_ERR_GNUTLS_ERROR 	= 	40 (0x28)
-        libvirt.VIR_ERR_GNUTLS_ERROR: 'A GNU TLS error occured',
+        libvirt.VIR_ERR_GNUTLS_ERROR: 'A GNU TLS error occurred',
         # failed to start network
         # VIR_WAR_NO_NETWORK 	= 	41 (0x29)
         libvirt.VIR_WAR_NO_NETWORK: 'Warning: Unable to start network',
