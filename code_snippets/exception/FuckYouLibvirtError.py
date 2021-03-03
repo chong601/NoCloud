@@ -539,3 +539,19 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_ERR_ERROR: 'Error'
         # }
     }
+
+    def __init__(self, errorDetails):
+        self._errorDetails = errorDetails
+        self.code, self.domain, self.message, self.level, self.str1, self.str2, self.str3, self.int1, self.int2 = self._errorDetails
+
+    def getRawErrorDataFromLibvirt(self):
+        return self._errorDetails
+
+    def getErrorNumberMessage(self):
+        return self.VIR_ERR_NUMBER_DICT.get(self.code)
+
+    def getErrorDomainMessage(self):
+        return self.VIR_ERR_DOMAIN_DICT.get(self.domain)
+
+    def getErrorLevelMessage(self):
+        return self.VIR_ERR_LEVEL_DICT.get(self.level)
