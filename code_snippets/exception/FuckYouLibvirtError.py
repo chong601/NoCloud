@@ -611,17 +611,87 @@ class FuckYouLibvirtError(Exception):
     }
 
     def __init__(self):
+        # I could make this nicer, but dumping to _errorDetails is probably the best solution because it's kinda raw
+        # and not that someone wants the raw output when you can have The Proper Output:tm: using the helper functions
+        #
+        # Example of the error that libvirt returns:
+        # (42, 10, "Domain not found: no domain with matching name 'vm-ubuntu-focal-cloud-init-test-5'", 2,
+        # 'Domain not found: %s', "no domain with matching name 'vm-ubuntu-focal-cloud-init-test-5'", None, -1, -1)
+        #
+        # The constructor is nothing much other than getting the error and then unpack the tuples to individual
+        # attributes that the user can easily just extract the error message out in saner ways other than diving through
+        # libvirt insanity called their documentation
+        #
+        # Also, using libvirt.virGetLastError because this is thread-safe according to libvirt:
+        # Provide a pointer to the last error caught at the library level
+        # The error object is kept in thread local storage, so separate threads can safely access this concurrently.
         self._errorDetails = libvirt.virGetLastError()
-        self.code, self.domain, self.message, self.level, self.str1, self.str2, self.str3, self.int1, self.int2 = self._errorDetails
+        self.code, self.domain, self.message, self.level, self.str1, self.str2, self.str3, self.int1, self.int\
+            = self._errorDetails
 
-    def getRawErrorDataFromLibvirt(self):
+    def getLibvirtRawErrorData(self):
+        # NO ONE, REALLY, NO ONE NEEDS THIS. LIBVIRT JUST DO THIS BECAUSE THEY HATE DEVS THAT WILL INEVITABLY WANT
+        # TO USE LIBVIRT.
+        # But if you wanna be fancy and can make do with libvirt own error details, you probably don't need NoCloud.
         return self._errorDetails
 
+    def getLibvirtErrorNumber(self):
+        # Gets the error code in the form of int that tells you the error based on virErrorNumber enum
+        # Like error 42 means 'domain not found or unexpectedly disappeared'
+        # OR you can just use getErrorNumberMessage() which will just return you the message based on the error reported
+        # by libvirt
+        return self.code
+
+    def getLibvirtErrorDomainNumber(self):
+        # Gets the domain of the error (like which driver, subsystem or the interface that the error originate).
+        # Based on virErrorDomain enum
+        # Use getErrorDomainMessage() if you want to get the error message
+        return self.domain
+
+    def getLibvirtErrorMessage(self):
+        # Returns the raw string from libvirt
+        return self.message
+
+    def getLibvirtErrorLevel(self):
+        # Returns the error code based on virErrorLevel enum
+        # Or you can get the message from getErrorLevelMessage()
+        return self.level
+
+    def getLibvirtStr1(self):
+        # Returns the "skeleton" error message that libvirt returns from message struct
+        return self.str1
+
+    def getLibvirtStr2(self):
+        # Returns the "skeleton" error message that libvirt returns from message struct
+        return self.str2
+
+    def getLibvirtStr3(self):
+        # Returns the "skeleton" error message that libvirt returns from message struct
+        return self.str3
+
+    def getLibvirtInt1(self):
+        # TODO: figure out what's the use of this
+        return self.int1
+
+    def getLibvirtInt2(self):
+        # TODO: figure out what's the use of this
+        return self.int2
+
     def getErrorNumberMessage(self):
+        # Just a nicer way to let users to get textual messages rather than reimplementing their own dicts for error
+        # messages.
+        # Also these dicts are not easy to make and is a major time sink
         return self.VIR_ERR_NUMBER_DICT.get(self.code)
 
     def getErrorDomainMessage(self):
+        # Just a nicer way to let users to get textual messages rather than reimplementing their own dicts for error
+        # messages.
+        # Also these dicts are not easy to make and is a major time sink
         return self.VIR_ERR_DOMAIN_DICT.get(self.domain)
 
     def getErrorLevelMessage(self):
+        # Just a nicer way to let users to get textual messages rather than reimplementing their own dicts for error
+        # messages.
+        # Also these dicts are not easy to make and is a major time sink
         return self.VIR_ERR_LEVEL_DICT.get(self.level)
+
