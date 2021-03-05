@@ -493,68 +493,104 @@ class FuckYouLibvirtError(Exception):
         libvirt.VIR_FROM_VMWARE: 'Error from VMware driver',
         # Error from event loop impl
         # VIR_FROM_EVENT 	= 	40 (0x28)
+        libvirt.VIR_FROM_EVENT: 'Error from event loop implementation',
         # Error from libxenlight driver
         # VIR_FROM_LIBXL 	= 	41 (0x29)
+        libvirt.VIR_FROM_LIBXL: 'Error from Xen Light libxl driver',
         # Error from lock manager
         # VIR_FROM_LOCKING 	= 	42 (0x2a)
+        # TODO: Is this for libvirt lock manager?
+        libvirt.VIR_FROM_LOCKING: 'Error from lock manager',
         # Error from Hyper-V driver
         # VIR_FROM_HYPERV 	= 	43 (0x2b)
+        libvirt.VIR_FROM_HYPERV: 'Error from Hyper-V driver',
         # Error from capabilities
         # VIR_FROM_CAPABILITIES 	= 	44 (0x2c)
+        # TODO: Is this from libvirt? libvirt has capabilities section that gets the capability of the host
+        libvirt.VIR_FROM_CAPABILITIES: 'Error from capabilities subsystem',
         # Error from URI handling
         # VIR_FROM_URI 	= 	45 (0x2d)
+        libvirt.VIR_FROM_URI: 'Error from URI handling',
         # Error from auth handling
         # VIR_FROM_AUTH 	= 	46 (0x2e)
+        libvirt.VIR_FROM_AUTH: 'Error from authentication handling',
         # Error from DBus
         # VIR_FROM_DBUS 	= 	47 (0x2f)
+        libvirt.VIR_FROM_DBUS: 'Error from D-Bus',
         # Error from Parallels
         # VIR_FROM_PARALLELS 	= 	48 (0x30)
+        libvirt.VIR_FROM_PARALLELS: 'Error from Parallels',
         # Error from Device
         # VIR_FROM_DEVICE 	= 	49 (0x31)
+        libvirt.VIR_FROM_DEVICE: 'Error from Device',
         # Error from libssh2 connection transport
         # VIR_FROM_SSH 	= 	50 (0x32)
+        libvirt.VIR_FROM_SSH: 'Error from libssh2 connection transport',
         # Error from lockspace
         # VIR_FROM_LOCKSPACE 	= 	51 (0x33)
+        # TODO: figure out where this is used
+        libvirt.VIR_FROM_LOCKSPACE: 'Error from lockspace',
         # Error from initctl device communication
         # VIR_FROM_INITCTL 	= 	52 (0x34)
+        libvirt.VIR_FROM_INITCTL: 'Error from initctl device communication',
         # Error from identity code
         # VIR_FROM_IDENTITY 	= 	53 (0x35)
+        libvirt.VIR_FROM_IDENTITY: 'Error from identity code',
         # Error from cgroups
         # VIR_FROM_CGROUP 	= 	54 (0x36)
+        libvirt.VIR_FROM_CGROUP: 'Error from Linux cgroups',
         # Error from access control manager
         # VIR_FROM_ACCESS 	= 	55 (0x37)
+        libvirt.VIR_FROM_ACCESS: 'Error from access control manager',
         # Error from systemd code
         # VIR_FROM_SYSTEMD 	= 	56 (0x38)
+        libvirt.VIR_FROM_SYSTEMD: 'Error from systemd code',
         # Error from bhyve driver
         # VIR_FROM_BHYVE 	= 	57 (0x39)
+        libvirt.VIR_FROM_BHYVE: 'Error from bhyve driver',
         # Error from crypto code
         # VIR_FROM_CRYPTO 	= 	58 (0x3a)
+        # I have a sneaky suspicion that this exists due to AMD's Secure Encrypted Virtualization, but I could be wrong
+        libvirt.VIR_FROM_CRYPTO: 'Error from crypto code',
         # Error from firewall
         # VIR_FROM_FIREWALL 	= 	59 (0x3b)
+        libvirt.VIR_FROM_FIREWALL: 'Error from firewall',
         # Error from polkit code
         # VIR_FROM_POLKIT 	= 	60 (0x3c)
+        libvirt.VIR_FROM_POLKIT: 'Error from PolicyKit code',
         # Error from thread utils
         # VIR_FROM_THREAD 	= 	61 (0x3d)
+        libvirt.VIR_FROM_THREAD: 'Error from thread utils',
         # Error from admin backend
         # VIR_FROM_ADMIN 	= 	62 (0x3e)
+        libvirt.VIR_FROM_ADMIN: 'Error from admin backend',
         # Error from log manager
         # VIR_FROM_LOGGING 	= 	63 (0x3f)
+        libvirt.VIR_FROM_LOGGING: 'Error from log manager',
         # Error from Xen xl config code
         # VIR_FROM_XENXL 	= 	64 (0x40)
+        libvirt.VIR_FROM_XENXL: 'Error from Xen xl config code',
         # Error from perf
         # VIR_FROM_PERF 	= 	65 (0x41)
+        libvirt.VIR_FROM_PERF: 'Error from perf',
         # Error from libssh connection transport
         # VIR_FROM_LIBSSH 	= 	66 (0x42)
+        libvirt.VIR_FROM_LIBSSH: 'Error from libssh connection transport',
         # Error from resource control
         # VIR_FROM_RESCTRL 	= 	67 (0x43)
+        libvirt.VIR_FROM_RESCTRL: 'Error from resource control',
         # Error from firewalld
         # VIR_FROM_FIREWALLD 	= 	68 (0x44)
+        libvirt.VIR_FROM_FIREWALLD: 'Error from firewalld',
         # Error from domain checkpoint
         # VIR_FROM_DOMAIN_CHECKPOINT 	= 	69 (0x45)
+        libvirt.VIR_ERR_NO_DOMAIN_CHECKPOINT: 'Error from domain checkpoint',
         # Error from TPM
         # VIR_FROM_TPM 	= 	70 (0x46)
+        libvirt.VIR_FROM_TPM: 'Error from TPM',
         # Error from BPF code
         # VIR_FROM_BPF 	= 	71 (0x47)
+        libvirt.VIR_FROM_BPF: 'Error from Linux kernel BPF code'
         #
         # VIR_ERR_DOMAIN_LAST 	= 	72 (0x48)
         #
