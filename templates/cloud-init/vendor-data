@@ -1,0 +1,28 @@
+#cloud-config
+system_info:
+  default_user:
+    name: root
+    shell: /bin/bash
+    lock_passwd: false
+  package_mirrors:
+    - arches: [ i386, amd64 ]
+      search:
+        primary:
+          - http://my.archive.ubuntu.com/ubuntu
+        security:
+          - http://security.ubuntu.com/ubuntu
+users:
+  - default
+manage_etc_hosts: True
+disable_root: false
+password: {% random_password %}
+chpasswd: { expire: False }
+ssh_pwauth: True
+hostname: {% hostname %}
+timezone: "Asia/Kuala_Lumpur"
+package_update: {% require_update %}
+package_upgrade: {% require_upgrade %}
+package_reboot_if_required: {% require_reboot %}
+packages:
+  - qemu-guest-agent
+  - haveged
