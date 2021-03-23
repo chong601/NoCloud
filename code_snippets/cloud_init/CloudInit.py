@@ -1,4 +1,5 @@
 import yaml
+from datetime import datetime
 from passlib.hash import sha512_crypt
 
 
@@ -79,6 +80,16 @@ class Users(BaseYamlObject):
             newuser.update({'passwd': passwd})
         elif isinstance(passwd, str):
             newuser.update({'passwd': sha512_crypt.hash(passwd)})
+
+        if isinstance(expiredate, str):
+
+            try:
+                datetime.strptime(expiredate, '%Y-%m-%d')
+                newuser.update({'expiredate': expiredate})
+            except ValueError as ex:
+                raise ValueError(ex)
+
+        self.users.append(newuser)
 
 
 class Packages(BaseYamlObject):
