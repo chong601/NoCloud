@@ -6,7 +6,6 @@ from .base_generator import BaseGenerator
 class MetaDataGenerator(BaseGenerator, ABC):
 
     def __init__(self, uuid=None):
-        super()
         self.uuid = uuid4() if uuid is None else UUID(uuid)
 
     def print_meta_data(self):
