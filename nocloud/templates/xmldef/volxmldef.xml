@@ -1,0 +1,7 @@
+<volume>
+  <name>{% name %}</name>
+  <capacity>{% capacity_bytes %}</capacity>
+  <target>
+    <format type='{% format %}'/>
+  </target>
+</volume>

@@ -1,0 +1,7 @@
+<pool type='{% pool_type %}'>
+  <name>{% pool_name %}</name>
+  <uuid>32458583-89fc-4441-83f6-fbc5eddf22ae</uuid>
+  <target>
+    <path>{% dir_path %}</path>
+  </target>
+</pool>

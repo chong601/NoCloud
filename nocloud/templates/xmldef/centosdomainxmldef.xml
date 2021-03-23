@@ -1,0 +1,108 @@
+<!--
+    Planned domain XML definition to be used for deployment
+    {} means the data will be templated from
+-->
+<domain type="kvm">
+    <name>{% domain_name %}</name>
+    <memory>{% max_memory_bytes %}</memory>
+    <currentMemory>{% provisioned_memory_bytes %}</currentMemory>
+    <vcpu current="{% provisioned_vcpu_count %}">{% host_cpu_count %}</vcpu>
+    <os>
+        <smbios mode='sysinfo'/>
+        <type arch="x86_64" machine="q35">hvm</type>
+        <boot dev="hd"/>
+    </os>
+    <!-- SMBios sample data to be used for cloud-init -->
+    <sysinfo type='smbios'>
+        <bios>
+            <entry name='vendor'>CloudBoss</entry>
+        </bios>
+        <!-- change maybe? -->
+        <system>
+            <entry name='manufacturer'>KVM</entry>
+            <entry name='product'>Virt-Manager</entry>
+            <entry name='version'>0.9.4</entry>
+            <entry name='serial'>{% cloud_init_nocloud_net_uri %}</entry>
+        </system>
+        <baseBoard>
+            <entry name='manufacturer'>LENOVO</entry>
+            <entry name='product'>20BE0061MC</entry>
+            <entry name='version'>0B98401 Pro</entry>
+            <entry name='serial'>W1KS427111E</entry>
+        </baseBoard>
+        <chassis>
+            <entry name='manufacturer'>Dell Inc.</entry>
+            <entry name='version'>2.12</entry>
+            <entry name='serial'>65X0XF2</entry>
+            <entry name='asset'>40000101</entry>
+            <entry name='sku'>Type3Sku1</entry>
+        </chassis>
+        <oemStrings>
+            <entry>myappname:some arbitrary data</entry>
+            <entry>otherappname:more arbitrary data</entry>
+        </oemStrings>
+    </sysinfo>
+    <features>
+        <acpi/>
+        <apic/>
+    </features>
+    <!--
+        Fix libvirt design idiosyncracies: Use cores rather than sockets
+    -->
+    <cpu mode="{% cpu_mode %}">
+        <topology sockets="{% socket_count %}" cores="{% core_count %}" threads="{% thread_count %}"/>
+    </cpu>
+    <clock offset="utc">
+        <timer name="rtc" tickpolicy="catchup"/>
+        <timer name="pit" tickpolicy="delay"/>
+        <timer name="hpet" present="no"/>
+    </clock>
+    <!--
+        We don't need sleep and hibernate, no thanks
+    -->
+    <pm>
+        <suspend-to-mem enabled="no"/>
+        <suspend-to-disk enabled="no"/>
+    </pm>
+    <devices>
+        <emulator>/usr/bin/qemu-system-x86_64</emulator>
+        <!-- Begin disk for-loop -->
+        <disk type="file" device="disk">
+            <driver name="qemu" type="qcow2" discard="unmap"/>
+            <source file="/zfs-storage-test/kvm-area/vm-ubuntu-focal-lxd-cluster-3/focal-server-cloudimg-amd64.img"/>
+            <target dev="sda" bus="scsi"/>
+        </disk>
+        <disk type="file" device="cdrom">
+            <driver name="qemu" type="raw"/>
+            <source file="/zfs-storage-test/kvm-area/vm-ubuntu-focal-lxd-cluster-3/vm-ubuntu-focal-lxd-cluster-3.iso"/>
+            <target dev="sdb" bus="sata"/>
+            <readonly/>
+        </disk>
+        <!-- End disk for-loop -->
+        <!-- Use virtio-scsi for performance and disk space reclaiming capabilites -->
+        <controller type="scsi" index="0" model="virtio-scsi"/>
+        <controller type="usb" index="0" model="qemu-xhci" ports="15"/>
+        <!-- Begin network for-loop -->
+        <interface type="network">
+            <source network="default"/>
+            <mac address="52:54:00:ce:3e:13"/>
+            <model type="virtio"/>
+        </interface>
+        <!-- End network for-loop -->
+        <console type="pty"/>
+        <channel type="unix">
+            <source mode="bind"/>
+            <target type="virtio" name="org.qemu.guest_agent.0"/>
+        </channel>
+        <input type="tablet" bus="usb"/>
+        <!-- Possible for a change maybe? -->
+        <graphics type="vnc" port="-1" listen="0.0.0.0"/>
+        <video>
+            <model type="qxl"/>
+        </video>
+        <memballoon model="virtio"/>
+        <rng model="virtio">
+            <backend model="random">/dev/urandom</backend>
+        </rng>
+    </devices>
+</domain>
