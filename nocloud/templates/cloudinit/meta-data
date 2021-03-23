@@ -1,0 +1,3 @@
+{
+  "instance-id": "{{ instance_uuid }}"
+}

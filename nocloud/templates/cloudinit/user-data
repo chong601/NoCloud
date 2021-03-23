@@ -1,0 +1,4 @@
+{% if user_data is not None %}
+#cloud-config
+{% user_data %}
+{% endif %}
