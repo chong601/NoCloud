@@ -15,14 +15,21 @@ users:
   - default
 manage_etc_hosts: True
 disable_root: false
-password: {% random_password %}
-chpasswd: { expire: False }
+password: {{ random_password }}
+chpasswd:
+  expire: False
 ssh_pwauth: True
-hostname: {% hostname %}
-timezone: "Asia/Kuala_Lumpur"
-package_update: {% require_update %}
-package_upgrade: {% require_upgrade %}
-package_reboot_if_required: {% require_reboot %}
+hostname: {{ hostname }}
+timezone: "Asia/Kuala_Lumpur
+{% if require_update %}
+package_update: {{ require_update }}
+{% endif %}
+{% if require_upgrade %}
+package_upgrade: {{ require_upgrade }}
+{% endif %}
+{% if require_reboot %}
+package_reboot_if_required: {{ require_reboot }}
+{% endif %}
 packages:
   - qemu-guest-agent
   - haveged
