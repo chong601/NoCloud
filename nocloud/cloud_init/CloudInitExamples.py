@@ -1,4 +1,4 @@
-from code_snippets.cloud_init.models import MetaDataGenerator, VendorDataGenerator
+from nocloud.cloud_init.models import MetaDataGenerator, VendorDataGenerator
 
 mdg = MetaDataGenerator()
 mdg.render()
