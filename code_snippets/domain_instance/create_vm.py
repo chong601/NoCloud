@@ -62,7 +62,9 @@ DISK_PATH = '/zfs-storage-test/kvm-area'
 IMAGE_NAME = 'focal-server-cloudimg-amd64.img'
 j2_env = Environment(
     loader=FileSystemLoader('templates'),
-    autoescape=select_autoescape(ENABLED_ESCAPES)
+    autoescape=select_autoescape(ENABLED_ESCAPES),
+    trim_blocks=True,
+    lstrip_blocks=True
 )
 
 print('Connecting to libvirt host at {}...'.format(LIBVIRT_URI))
