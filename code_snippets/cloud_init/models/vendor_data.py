@@ -12,7 +12,7 @@ class VendorDataGenerator(BaseGenerator, ABC):
         self.require_upgrade = require_upgrade
         self.require_reboot = require_reboot
 
-    def print_vendor_data(self):
+    def render(self):
         template = super().j2_env.get_template('vendor-data')
         print(template.render(random_password=self.password, hostname=self.hostname, require_update=self.require_update,
                               require_upgrade=self.require_upgrade, require_reboot=self.require_reboot))

@@ -8,6 +8,6 @@ class UserDataGenerator(BaseGenerator, ABC):
         pass
         # self.uuid = uuid4()
 
-    def print_meta_data(self):
+    def render(self):
         template = super().j2_env.get_template('user-data')
         print(template.render(instance_uuid=self.uuid))
