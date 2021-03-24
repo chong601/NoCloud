@@ -1,5 +1,5 @@
 from abc import ABC
-from jinja2 import FileSystemLoader, Environment, select_autoescape, PackageLoader
+from jinja2 import Environment, select_autoescape, PackageLoader
 
 
 class BaseGenerator(object):
@@ -39,8 +39,8 @@ class CPU(object):
         self.host_cpu_count = host_cpu_count if host_cpu_count is not None and host_cpu_count > 0 else ValueError(
             'Host CPU count must be more than zero!')
         self.mode = mode if mode is not None else 'host-model'
-        self.socket_count = socket_count if socket_count is not None and socket_count > 0  else 1
-        self.core_count = core_count if core_count is not None and core_count > 0  else self.host_cpu_count
+        self.socket_count = socket_count if socket_count is not None and socket_count > 0 else 1
+        self.core_count = core_count if core_count is not None and core_count > 0 else self.host_cpu_count
         self.thread_count = thread_count if thread_count is not None and thread_count > 0 else 1
 
     def __str__(self):
