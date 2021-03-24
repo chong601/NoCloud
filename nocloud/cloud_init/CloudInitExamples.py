@@ -1,4 +1,4 @@
-from nocloud.cloud_init.models import MetaDataGenerator, VendorDataGenerator
+from models import MetaDataGenerator, VendorDataGenerator
 
 mdg = MetaDataGenerator()
 mdg.render()
