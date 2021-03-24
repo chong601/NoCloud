@@ -3,10 +3,11 @@
     {} means the data will be templated from
 -->
 <domain type="kvm">
-    <name>{% domain_name %}</name>
-    <memory>{% max_memory_bytes %}</memory>
-    <currentMemory>{% provisioned_memory_bytes %}</currentMemory>
-    <vcpu current="{% provisioned_vcpu_count %}">{% host_cpu_count %}</vcpu>
+    <name>{{ domain_name }}</name>
+    <!-- libvirt assumes that memory values provided is in KiB -->
+    <memory{% if max_memory_unit != 'KiB' %} unit="{{ max_memory_unit }}"{% endif %}>{{ max_memory_amount }}</memory>
+    <currentMemory{% if provisioned_memory_unit != 'KiB' %} unit="{{ provisioned_memory_unit }}"{% endif %}>{{ provisioned_memory_amount }}</currentMemory>
+    <vcpu current="{{ provisioned_vcpu_count }}">{{ host_cpu_count }}</vcpu>
     <os>
         <smbios mode='sysinfo'/>
         <type arch="x86_64" machine="q35">hvm</type>
@@ -15,14 +16,14 @@
     <!-- SMBios sample data to be used for cloud-init -->
     <sysinfo type='smbios'>
         <bios>
-            <entry name='vendor'>CloudBoss</entry>
+            <entry name='vendor'>NoCloud</entry>
         </bios>
         <!-- change maybe? -->
         <system>
             <entry name='manufacturer'>KVM</entry>
             <entry name='product'>Virt-Manager</entry>
             <entry name='version'>0.9.4</entry>
-            <entry name='serial'>{% cloud_init_nocloud_net_uri %}</entry>
+            <entry name='serial'>{{ cloud_init_nocloud_net_uri }}</entry>
         </system>
         <baseBoard>
             <entry name='manufacturer'>LENOVO</entry>
@@ -49,8 +50,8 @@
     <!--
         Fix libvirt design idiosyncracies: Use cores rather than sockets
     -->
-    <cpu mode="{% cpu_mode %}">
-        <topology sockets="{% socket_count %}" cores="{% core_count %}" threads="{% thread_count %}"/>
+    <cpu mode="{{ cpu_mode }}">
+        <topology sockets="{{ socket_count }}" cores="{{ core_count }}" threads="{{ thread_count }}"/>
     </cpu>
     <clock offset="utc">
         <timer name="rtc" tickpolicy="catchup"/>
@@ -67,27 +68,26 @@
     <devices>
         <emulator>/usr/bin/qemu-system-x86_64</emulator>
         <!-- Begin disk for-loop -->
-        <disk type="file" device="disk">
-            <driver name="qemu" type="qcow2" discard="unmap"/>
-            <source file="/zfs-storage-test/kvm-area/vm-ubuntu-focal-lxd-cluster-3/focal-server-cloudimg-amd64.img"/>
-            <target dev="sda" bus="scsi"/>
+        {% for disk in disks %}
+        <disk type="{{ disk_type }}" device="{{ disk_device }}">
+            <driver name="{{ driver_name }}" type="{{ driver_type }}"{% if enable_discard %} discard="unmap"{% endif %}/>
+            <source file="{{ disk_path }}"/>
+            <target dev="{{ target_device }}" bus="{{ target_bus }}"/>
+            {% if disk_device == 'cdrom' %}<readonly/>{% endif %}
         </disk>
-        <disk type="file" device="cdrom">
-            <driver name="qemu" type="raw"/>
-            <source file="/zfs-storage-test/kvm-area/vm-ubuntu-focal-lxd-cluster-3/vm-ubuntu-focal-lxd-cluster-3.iso"/>
-            <target dev="sdb" bus="sata"/>
-            <readonly/>
-        </disk>
+        {% endfor %}
         <!-- End disk for-loop -->
         <!-- Use virtio-scsi for performance and disk space reclaiming capabilites -->
         <controller type="scsi" index="0" model="virtio-scsi"/>
         <controller type="usb" index="0" model="qemu-xhci" ports="15"/>
         <!-- Begin network for-loop -->
-        <interface type="network">
-            <source network="default"/>
-            <mac address="52:54:00:ce:3e:13"/>
-            <model type="virtio"/>
+        {% for network in networks %}
+        <interface type="{{ interface_type }}">
+            <source network="{{ interface_source_network_name }}"/>
+            <mac address="{{ mac_address }}"/>
+            <model type="{{ interface_model_type }}"/>
         </interface>
+        {% endfor %}
         <!-- End network for-loop -->
         <console type="pty"/>
         <channel type="unix">
